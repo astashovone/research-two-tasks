@@ -1,0 +1,41 @@
+spark-submit \
+--master spark://192.168.31.136:7077 \
+--deploy-mode client \
+--executor-memory 1G \
+--executor-cores 8 \
+wordcount.py ../Heart_Rate.csv
+
+spark-submit \
+—master k8s://192.168.31.136:443 \
+—deploy-mode client \
+—executor-memory 1G \
+—executor-cores 8 \
+wordcount.py ../Heart_Rate.csv
+
+spark-submit \
+--master spark://192.168.31.136:7077 \
+--deploy-mode client \
+--executor-memory 1G \
+--executor-cores 3 \
+wordcount.py ../Heart_Rate.csv
+
+spark-submit \
+--master spark://192.168.31.136:7077 \
+--deploy-mode client \
+--executor-memory 6G \
+--executor-cores 4 \
+/opt/spark/examples/src/main/python/pi.py
+
+spark-submit --master spark://192.168.31.136:7077 --deploy-mode client --executor-memory 6G --executor-cores 4 spark-tasks/wordcount-df.py 1000000.csv
+
+spark-submit --class SparkPi --master spark://192.168.31.136:7077 --deploy-mode client --executor-memory 6G --executor-cores 4 sparkpi_2.12-1.0.jar
+
+spark-submit --class wordcount wordcount_2.12-1.0.jar
+
+spark-submit --class wordcount --deploy-mode client --executor-memory 6G --executor-cores 4 wordcount
+
+spark-submit --master spark://192.168.31.136:7077 --deploy-mode client --executor-memory 6G --executor-cores 4 spark-tasks/wordcount.py 100000000.csv
+
+spark-submit --class JavaWordCount --master spark://192.168.31.136:7077 --deploy-mode client --executor-memory 6G --executor-cores 4 --jars java-app/target/JavaWordCount-1.0.jar 100000000.csv
+
+spark-submit --class jwc --master local[4] java-app/target/jwc-1.0.jar 100000000.csv
