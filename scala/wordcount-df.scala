@@ -9,7 +9,7 @@ object wordcount {
                                               .getOrCreate()
 
         val df = spark.read.csv(file)
-        #df.show(10,truncate=false)
+        // df.show(10,truncate=false)
         
         val wordcount = df.groupBy("_c0").count()
         wordcount.show(20, truncate=false)
