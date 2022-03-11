@@ -1,0 +1,113 @@
+#python rdd example github 
+
+import sys
+from operator import add
+
+from pyspark.sql import SparkSession
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: wordcount <file>", file=sys.stderr)
+        sys.exit(-1)
+
+    spark = SparkSession\
+        .builder\
+        .appName("Python RDD WordCount")\
+        .getOrCreate()
+
+    lines = spark.read.text(sys.argv[1]).rdd.map(lambda r: r[0])
+    counts = lines.flatMap(lambda x: x.split(' ')) \
+                  .map(lambda x: (x, 1)) \
+                  .reduceByKey(add)
+    output = counts.collect()
+
+    out = 0#
+    for (word, count) in output:
+        print("%s: %i" % (word, count))
+        out+=1#
+        if out == 19:#
+            break#
+
+
+    spark.stop()
+
+#scala rdd example https://alvinalexander.com/source-code/scala-cookbook-apache-spark-word-count-example/
+
+import org.apache.spark.sql.SparkSession
+
+object wordcount {
+    def main(args: Array[String]) {
+        val file = "1000000.csv"
+        val spark: SparkSession = SparkSession.builder
+                                              .appName("Scala WordCount RDD")
+                                              .master("spark://192.168.31.136:7077")
+                                              .getOrCreate()
+        val fileRdd = spark.sparkContext.textFile(file)
+
+        // create the counts
+        val counts = fileRdd.map(_.replaceAll("[.,]", ""))
+                            .map(_.replace("—", " "))
+                            .flatMap(line => line.split(" "))
+                            .map(word => (word, 1))
+                            .reduceByKey(_ + _)
+                            .sortBy(_._2)
+                            .collect
+
+        println( "------------------------------------------")
+        counts.foreach(println)
+        println( "------------------------------------------")
+
+        spark.stop()
+    }
+}
+
+
+#scala dataframe example https://blog.knoldus.com/using-spark-dataframes-for-word-count/
+
+import org.apache.spark.sql.SparkSession
+
+object wordcount {
+    def main(args: Array[String]) {
+        val file = "1000000.csv"
+        val spark: SparkSession = SparkSession.builder
+                                              .appName("Scala WordCount DF")
+                                              .master("spark://192.168.31.136:7077")
+                                              .getOrCreate()
+
+        val df = spark.read.csv(file)
+        #df.show(10,truncate=false)
+        
+        val wordcount = df.groupBy("_c0").count()
+        wordcount.show(20, truncate=false)
+        
+        spark.stop()
+    }
+}
+
+
+#python dataframe example https://stackoverflow.com/questions/48927271/count-number-of-words-in-a-spark-dataframe
+
+import sys
+
+from pyspark.sql import SparkSession
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: wordcount <file>", file=sys.stderr)
+        sys.exit(-1)
+
+    spark = SparkSession\
+        .builder\
+        .appName("Python DataFrame WordCount")\
+        .getOrCreate()
+
+    dataframe = spark.read.csv(sys.argv[1])
+    #dataframe.printSchema()
+    #dataframe.show(truncate=False)
+
+    wordcount = dataframe.groupBy("_c0").count()
+    #wordcount.printSchema()
+    wordcount.show(truncate=False)
+
+    spark.stop()
